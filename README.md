@@ -1,4 +1,77 @@
-# Design-Baselines
+# Design-Baselines-Fix
+---
+
+# Fixes
+We make several installation fixes. Our goal is to make the benchmark work for GPUs with Ampere (e.g. Nvidia 3090) and more recent architectures. We also fix some issues with the installation process.
+
+Changes:
+- Fixed `super().__init__()` for some nets
+- Fixed `requirements.txt` to include new TF and more
+- Updated `environment.yml` for latest cudnn and cudatoolkit
+- Installation described below
+
+# Installation
+
+Before installing the main Conda enviroment, make sure to install the following as well as Conda.
+
+## Mujoco
+1. Download mujoco200 from here https://www.roboti.us/download.html, and extract it to `.mujoco/mujoco200` (rename it to `mujoco200`).
+2. Then I have to install the license from here https://www.roboti.us/file/mjkey.txt to `.mujoco/mjkey.txt`.
+3. Update the environment export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/$USER/.mujoco/mujoco200/bin
+4. Install with 
+```bash
+pip install mujoco-py==2.0.2.3
+```
+
+## TensorRT
+First:
+```bash
+pip install nvidia-pyindex
+```
+then:
+```bash
+pip install nvidia-tensorrt
+```
+After installing TensorRT, we need to link `libnvinfer.so.8` to `libnvinfer.so.7` as well as its plugin.
+```bash
+find / -name libnvinfer.so.8
+```
+this will give e.g. `$PATH/site-packages/tensorrt/libnvinfer.so.8` (where `$PATH` is the path to your conda environment)
+
+then:
+```bash
+sudo ln -s $PATH/site-packages/tensorrt/libnvinfer.so.8 $PATH/site-packages/tensorrt/libnvinfer.so.7
+sudo ln -s $PATH/site-packages/tensorrt/libnvinfer_plugin.so.8 $PATH/site-packages/tensorrt/libnvinfer_plugin.so.7
+```
+Finally, add the following to your `.bashrc`:
+```bash
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PATH/site-packages/tensorrt/
+```
+
+## Conda environment
+Now run
+```bash
+conda create -f design-baselines/environment.yml
+```
+
+It should work now. If you get an error, try to install the packages manually.
+
+## Test if it works
+```bash
+python -c 'import tensorflow as tf;  tf.test.is_gpu_available(cuda_only=False)' 
+```
+If you get some errors, try manually installing the packages or ask ChatGPT / Google. You can also submit an issue here, but I am not sure if I can help you.
+
+Finally, you may try running 
+```bash
+bash test.sh
+```
+by first subsituting in the file `NUM_CPUS=20` and `NUM_GPUS=1` with the number of CPUs and GPUs you have. This will run the benchmark command in the description below.
+
+
+---
+
+# Package README
 
 Design-Baselines is a set of **baseline algorithms** for solving automatic design problems that involve choosing an input that maximizes a black-box function. This type of optimization is used across scientific and engineering disciplines in ways such as designing proteins and DNA sequences with particular functions, chemical formulas and molecule substructures, the morphology and controllers of robots, and many more applications. 
 
