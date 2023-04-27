@@ -1,5 +1,26 @@
 # Design-Baselines-Fix
----
+
+Baselines for Model-Based Optimization installation guide and fixes to make it compatible with AMPERE and newever GPUs (e.g. 3090 etc.) 
+
+Tested on the following configurations:
+- Ubuntu 22.04, 1x3090, CUDA 12.1
+- Ubuntu 18.04, 8x3090, CUDA 11.4
+
+Original repository: https://github.com/brandontrabucco/design-baselines
+
+## Quick installation
+
+
+After installing `conda`, you may run the following script to install the benchmark:
+
+```bash
+bash install.sh
+```
+Note that the environment variables may not be correctly set. In this case, you may either manually set them or run the following script:
+```bash
+bash set_env.sh
+```
+If this still does not work, you may try with other custom paths.
 
 # Fixes
 We make several installation fixes. Our goal is to make the benchmark work for GPUs with Ampere (e.g. Nvidia 3090) and more recent architectures. We also fix some issues with the installation process.
@@ -69,9 +90,12 @@ bash test.sh
 by first subsituting in the file `NUM_CPUS=20` and `NUM_GPUS=1` with the number of CPUs and GPUs you have. This will run the benchmark command in the description below.
 
 
+## Feedback
+If you have any feedback or would like to improve the installation process, please submit a pull request or an issue ;)
+
 ---
 
-# Package README
+# Original Package README
 
 Design-Baselines is a set of **baseline algorithms** for solving automatic design problems that involve choosing an input that maximizes a black-box function. This type of optimization is used across scientific and engineering disciplines in ways such as designing proteins and DNA sequences with particular functions, chemical formulas and molecule substructures, the morphology and controllers of robots, and many more applications. 
 
