@@ -37,6 +37,10 @@ fi
 
 echo "Creating the Conda environment"
 conda env create -f environment.yml
+conda init "$(basename $SHELL)"
+
+echo "Reinitializing the shell and activating the Conda environment"
+exec $SHELL
 conda activate design-baselines
 
 echo "Installing CUDA and its dependencies"
@@ -52,9 +56,6 @@ ln -s $LIBVINFER_PLUGIN ${LIBVINFER_PLUGIN%/*}/libnvinfer_plugin.so.7
 
 echo "Applying fix for importing design-bench; this works also with no installed Mujoco"
 cp fixes/__init__.py $(python -c "import site; print(site.getsitepackages()[0] + '/design_bench/oracles/exact/')")
-
-# export LD_LIBRARY_PATH=$CONDA_PREFIX/lib:$(dirname $(dirname $(which python)))/lib:$(dirname $(find "$(dirname $(dirname $(which python)))" -name "*libnvinfer.so.8")):~/.mujoco/mujoco200/bin
-# export XLA_FLAGS=--xla_gpu_cuda_data_dir=/usr/lib/cuda   
 
 echo "Setting env vars in conda with LD_LIBRARY_PATH and XL_FLAGS; you may need to change this path if you have a different CUDA location"
 conda env config vars set LD_LIBRARY_PATH=$CONDA_PREFIX/lib:$(dirname $(dirname $(which python)))/lib:$(dirname $(find "$(dirname $(dirname $(which python)))" -name "*libnvinfer.so.8")):~/.mujoco/mujoco200/bin
