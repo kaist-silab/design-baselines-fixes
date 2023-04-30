@@ -8,34 +8,39 @@ Tested on the following configurations:
 
 Original repository: https://github.com/brandontrabucco/design-baselines
 
-## Quick installation
+## Fixes
+We make several installation fixes. Our goal is to make the benchmark work for GPUs with Ampere (e.g. Nvidia 3090) and more recent architectures. We also fix some issues with the installation process.
 
+Changes:
+- Make Mujoco installation optional
+- Fixed `super().__init__()` for some nets
+- Fixed `requirements.txt` to include new TF and more
+- Updated `environment.yml` for latest cudnn and cudatoolkit
+- Updated `design-bench` to avoid importing error with `gym`
+- Installation described below
+
+# Quick installation
 
 After installing `conda`, you may run the following script to install the benchmark:
 
 ```bash
 bash install.sh
 ```
-Note that the environment variables may not be correctly set. In this case, you may either manually set them or run the following script:
-```bash
-bash set_env.sh
-```
-If this still does not work, you may try with other custom paths.
 
-# Fixes
-We make several installation fixes. Our goal is to make the benchmark work for GPUs with Ampere (e.g. Nvidia 3090) and more recent architectures. We also fix some issues with the installation process.
+you may also choose whether to install Mujoco or not via the script.
 
-Changes:
-- Fixed `super().__init__()` for some nets
-- Fixed `requirements.txt` to include new TF and more
-- Updated `environment.yml` for latest cudnn and cudatoolkit
-- Installation described below
 
-# Installation
+# Full guide
 
 Before installing the main Conda enviroment, make sure to install the following as well as Conda.
 
-## Mujoco
+## Conda environment
+Create a new conda environment:
+```bash
+conda create -f environment.yml
+```
+
+## Mujoco (Optional)
 1. Download mujoco200 from here https://www.roboti.us/download.html, and extract it to `.mujoco/mujoco200` (rename it to `mujoco200`).
 2. Then I have to install the license from here https://www.roboti.us/file/mjkey.txt to `.mujoco/mjkey.txt`.
 3. Update the environment export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/$USER/.mujoco/mujoco200/bin
@@ -44,15 +49,17 @@ Before installing the main Conda enviroment, make sure to install the following 
 pip install mujoco-py==2.0.2.3
 ```
 
+Remember to install the following packages required by `design-baselines`:
+```bash
+ pip install Cython==0.29.21  robel==0.1.2 morphing-agents==1.5.1 design-bench[all]==2.0.20
+```
+
 ## TensorRT
 First:
 ```bash
-pip install nvidia-pyindex
+pip install nvidia-pyindex nvidia-tensorrt
 ```
-then:
-```bash
-pip install nvidia-tensorrt
-```
+
 After installing TensorRT, we need to link `libnvinfer.so.8` to `libnvinfer.so.7` as well as its plugin.
 ```bash
 find / -name libnvinfer.so.8
@@ -69,10 +76,16 @@ Finally, add the following to your `.bashrc`:
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PATH/site-packages/tensorrt/
 ```
 
-## Conda environment
-Now run
+## Set environment variables
+Set the environment variables as follows:
 ```bash
-conda create -f design-baselines/environment.yml
+conda env config vars set LD_LIBRARY_PATH=$CONDA_PREFIX/lib:$(dirname $(dirname $(which python)))/lib:$(dirname $(find "$(dirname $(dirname $(which python)))" -name "*libnvinfer.so.8")):~/.mujoco/mujoco200/bin
+conda env config vars set XLA_FLAGS=--xla_gpu_cuda_data_dir=/usr/lib/cuda
+```
+
+Finally, reactivate the environment:
+```bash
+conda activate design-baselines
 ```
 
 It should work now. If you get an error, try to install the packages manually.

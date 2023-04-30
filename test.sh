@@ -3,13 +3,14 @@ NUM_CPUS=20
 NUM_GPUS=1
 
 for TASK_NAME in \
-    superconductor \
-    ant \
-    dkitty \
-    hopper \
-    gfp \
-    tf-bind-8 \
-    utr; do
+    tf-bind-8; do
+    # superconductor \
+    # ant \
+    # dkitty \
+    # hopper \
+    # gfp \
+    # tf-bind-8 \
+    # utr; do
     
   for ALGORITHM_NAME in \
       autofocused-cbas \
